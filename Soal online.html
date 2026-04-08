@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUIS CERIA KELAS 3A</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --p: #FF4757; --s: #2ED573; --a: #FFA502; --b: #1E90FF; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: #70a1ff; 
+            background: linear-gradient(135deg, #70a1ff 0%, #be2edd 100%);
+            margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; overflow: hidden; position: relative;
+        }
+
+        /* Animasi Balon di Latar Belakang */
+        .balloon {
+            position: absolute; bottom: -150px; width: 40px; height: 50px;
+            background: rgba(255,255,255,0.3); border-radius: 50%;
+            z-index: 0; animation: float 10s infinite linear;
+        }
+        @keyframes float {
+            from { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            to { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+
+        .container { 
+            background: white; width: 100%; max-width: 500px; padding: 30px; border-radius: 35px; 
+            box-shadow: 0 20px 0 rgba(0,0,0,0.1); position: relative; border: 5px solid var(--a);
+            z-index: 10;
+        }
+        
+        h2 { font-family: 'Fredoka One', cursive; text-align: center; color: var(--p); letter-spacing: 2px; margin: 0; }
+        
+        .progress-bar { height: 15px; background: #eee; border-radius: 10px; margin: 20px 0; overflow: hidden; border: 2px solid #ddd; }
+        #fill { height: 100%; background: linear-gradient(90deg, var(--s), var(--a)); width: 0%; transition: 0.5s; }
+        
+        select, .btn { width: 100%; padding: 15px; border-radius: 20px; border: none; font-size: 16px; font-weight: 900; margin-top: 15px; font-family: 'Nunito', sans-serif; cursor: pointer; }
+        select { border: 3px solid #ddd; background: #f9f9f9; text-align-last: center; }
+        
+        .btn { transition: 0.2s; color: white; text-transform: uppercase; }
+        .btn-start { background: var(--p); box-shadow: 0 6px 0 #c0392b; }
+        .btn-nav { background: var(--b); box-shadow: 0 6px 0 #2980b9; flex: 1; margin: 5px; }
+        .btn-back { background: #95a5a6; box-shadow: 0 6px 0 #7f8c8d; flex: 1; margin: 5px; }
+        .btn-send { background: var(--s); box-shadow: 0 6px 0 #218c53; flex: 1; margin: 5px; }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+
+        .step { display: none; animation: slideIn 0.4s ease-out; }
+        .active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        .q-text { font-size: 1.1em; font-weight: 800; color: #2c3e50; margin-bottom: 20px; min-height: 60px; text-align: center; }
+        .opt { display: flex; align-items: center; background: #f1f2f6; padding: 15px; margin-bottom: 12px; border-radius: 15px; border: 2px solid #dfe4ea; cursor: pointer; transition: 0.2s; }
+        .opt:hover { background: #e1e2e6; transform: scale(1.02); }
+        .opt input { transform: scale(1.5); margin-right: 15px; }
+
+        .hidden { display: none !important; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .m-content { background: white; padding: 30px; border-radius: 25px; text-align: center; width: 80%; max-width: 350px; border: 5px solid var(--s); }
+
+        #finish { text-align: center; animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .big-score { font-size: 90px; color: var(--p); font-family: 'Fredoka One', cursive; margin: 10px 0; text-shadow: 4px 4px 0 #eee; }
+    </style>
+</head>
+<body>
+
+<audio id="snd-pop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+<audio id="snd-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+<div id="bg-balloons"></div>
+
+<div class="container">
+    <h2>🎈 KUIS CERIA 🎈</h2>
+    <p style="text-align:center; font-weight:bold; color:#7f8c8d; margin-top:5px;">KELAS 3A - BU QUEEN</p>
+
+    <div id="prog-cont" class="progress-bar hidden"><div id="fill"></div></div>
+
+    <div id="p-start">
+        <p style="text-align:center; font-weight:800; color: #555;">Pilih Nama Kamu Untuk Mulai:</p>
+        <select id="siswa">
+            <option value="">-- Klik Di Sini --</option>
+            <option>AL TAAF FAIQ KUMAINI</option><option>ALBY ARKAAN EFENDY</option>
+            <option>ANGGI ANGELIKA SIANIPAR</option><option>ANNISA NUR HABIBAH</option>
+            <option>ASRAFIL AKBAR</option><option>EVELYN RENATA MARPAUNG</option>
+            <option>FAEQA AEYZA TASNIM</option><option>FELGIANUS ETOM</option>
+            <option>FRANSISKA CHELSIANA LEKE</option><option>IAN HAFIZ ALFARABY</option>
+            <option>LAKSMI SALSABILA JELITA</option><option>MAR'AH FIQRIAH</option>
+            <option>MIFAHLUL AIRA</option><option>MOHAMMAD ABDULLAH SAHDAN KAMALUDIN</option>
+            <option>MUH TAKDIR</option><option>MUH ZAIRULLAH AL MUBARAQ</option>
+            <option>MUH.REFAN</option><option>MUHAMMAD AFDAL</option>
+            <option>MUHAMMAD AL FATAR M.I</option><option>MUHAMMAD ALIF RAMADHAN</option>
+            <option>MUHAMMAD CAKRA</option><option>MUHAMMAD HAIDAR GIBRAN</option>
+            <option>MUHAMMAD PUTRA</option><option>MUHAMMAD SYAHRIL</option>
+            <option>NOVITA SARI</option><option>NUR MELISYA</option>
+            <option>OKTAVIANA MARIA SURA</option><option>RANI APRILIANI</option>
+            <option>RATU RAYSHA</option><option>RENATA MAHAYANA</option>
+            <option>RIFQI SATRIA IRAWAN</option><option>SULEHA</option>
+            <option>ZAHIRA PUTRI HANIFA</option>
+        </select>
+        <button class="btn btn-start" onclick="playSnd('pop'); mulai()">MAIN SEKARANG! 🚀</button>
+    </div>
+
+    <div id="p-quiz" class="hidden">
+        <div id="soal-box"></div>
+        <div style="display:flex;">
+            <button id="back" class="btn btn-back hidden" onclick="playSnd('pop'); geser(-1)">KEMBALI</button>
+            <button id="next" class="btn btn-nav" onclick="playSnd('pop'); geser(1)">LANJUT</button>
+            <button id="send" class="btn btn-send hidden" onclick="playSnd('pop'); kirimData()">KIRIM ✨</button>
+        </div>
+    </div>
+
+    <div id="finish" class="hidden">
+        <h3 id="h-nama">HEBAT!</h3>
+        <p>Nilai Kamu Adalah:</p>
+        <div class="big-score" id="h-skor">0</div>
+        <p style="font-weight:bold; color:var(--s);">DATA BERHASIL DISIMPAN! ✅</p>
+        <button class="btn btn-start" onclick="location.reload()">KEMBALI KE AWAL</button>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="m-content">
+        <div id="m-icon" style="font-size:50px;">🎉</div>
+        <h3 id="m-text">Berhasil!</h3>
+        <button class="btn btn-start" onclick="playSnd('pop'); tutupModal()">OKE!</button>
+    </div>
+</div>
+
+<script>
+    // LINK DEPLOY BARU BU QUEEN
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbywj6PTO2fpfqGrEH7e406J7llJVSnr2rdgZWMU00MTDE2-ARp90jIcK5I997cOC8vrTA/exec";
+
+    const kuis = [
+        {q: "Hari kelahiran Pancasila diperingati pada tanggal 1 Juni. Tokoh penggagasnya adalah...", a: "a", o: ["Soekarno","Moh. Yamin","Soepomo","Moh. Hatta"]},
+        {q: "Rela berkorban demi Bangsa dan Negara adalah pengamalan sila ke...", a: "b", o: ["Dua","Tiga","Empat","Lima"]},
+        {q: "Siapa tokoh yang dikenal sebagai penggagas dasar negara Pancasila?", a: "b", o: ["R.A. Kartini","Ir. Soekarno","Ki Hajar Dewantara","Jenderal Sudirman"]},
+        {q: "Sikap yang patut diteladani dari perumus Pancasila adalah...", a: "c", o: ["Egois","Suka bertengkar","Cinta tanah air","Malas belajar"]},
+        {q: "Para perumus Pancasila memiliki semangat...", a: "b", o: ["Menang sendiri","Persatuan & Kesatuan","Malas-malasan","Bermain"]},
+        {q: "Sikap rela berkorban ditunjukkan dengan...", a: "b", o: ["Egois","Membantu orang lain","Tidak peduli","Bermain terus"]},
+        {q: "Para perumus Pancasila bekerja dengan cara...", a: "b", o: ["Bertengkar","Musyawarah","Bermain","Diam saja"]},
+        {q: "Sikap menghargai perbedaan disebut...", a: "b", o: ["Permusuhan","Toleransi","Kemalasan","Kesombongan"]},
+        {q: "Teladani sikap para tokoh dalam kehidupan...", a: "a", o: ["Sehari-hari","Saat bermain","Saat libur","Di rumah saja"]},
+        {q: "Drs. Moh. Hatta adalah pahlawan yang menjabat sebagai...", a: "b", o: ["Presiden ke-1","Wakil Presiden ke-1","Menteri","Panglima"]}
+    ];
+
+    let step = 0;
+    let namaUser = "";
+
+    // Animasi Balon Latar Belakang
+    function createBalloon() {
+        const bg = document.getElementById('bg-balloons');
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        b.style.left = Math.random() * 100 + 'vw';
+        b.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        b.style.background = `hsla(${Math.random() * 360}, 70%, 70%, 0.4)`;
+        bg.appendChild(b);
+        setTimeout(() => b.remove(), 10000);
+    }
+    setInterval(createBalloon, 700);
+
+    function playSnd(type) {
+        const s = document.getElementById(type === 'pop' ? 'snd-pop' : 'snd-win');
+        s.currentTime = 0;
+        s.play();
+    }
+
+    const box = document.getElementById('soal-box');
+    kuis.forEach((s, i) => {
+        let div = document.createElement('div');
+        div.className = `step ${i==0?'active':''}`;
+        div.id = `q-${i}`;
+        div.innerHTML = `<p class="q-text">${i+1}. ${s.q}</p>` + 
+            s.o.map((opt, idx) => `
+                <label class="opt">
+                    <input type="radio" name="r${i}" value="${['a','b','c','d'][idx]}">
+                    <span>${['a','b','c','d'][idx]}. ${opt}</span>
+                </label>
+            `).join('');
+        box.appendChild(div);
+    });
+
+    function bukaModal(teks, ikon) {
+        document.getElementById('m-text').innerText = teks;
+        document.getElementById('m-icon').innerText = ikon;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function tutupModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function mulai() {
+        namaUser = document.getElementById('siswa').value;
+        if(!namaUser) return bukaModal("Pilih namamu dulu ya!", "😅");
+        document.getElementById('p-start').classList.add('hidden');
+        document.getElementById('p-quiz').classList.remove('hidden');
+        document.getElementById('prog-cont').classList.remove('hidden');
+        updateProgress();
+    }
+
+    function geser(v) {
+        if(v==1 && !document.querySelector(`input[name="r${step}"]:checked`)) return bukaModal("Jawaban belum dipilih!", "✏️");
+        document.getElementById(`q-${step}`).classList.remove('active');
+        step += v;
+        document.getElementById(`q-${step}`).classList.add('active');
+        document.getElementById('back').classList.toggle('hidden', step == 0);
+        document.getElementById('next').classList.toggle('hidden', step == kuis.length-1);
+        document.getElementById('send').classList.toggle('hidden', step != kuis.length-1);
+        updateProgress();
+    }
+
+    function updateProgress() { document.getElementById('fill').style.width = ((step+1)/kuis.length)*100 + "%"; }
+
+    function kirimData() {
+        if(!document.querySelector(`input[name="r${step}"]:checked`)) return bukaModal("Pilih jawaban terakhir!", "✏️");
+        let benar = 0;
+        kuis.forEach((s, i) => {
+            let jwb = document.querySelector(`input[name="r${i}"]:checked`).value;
+            if(jwb == s.a) benar++;
+        });
+        let skorFinal = benar * 10;
+        const btnSend = document.getElementById('send');
+        btnSend.disabled = true; btnSend.innerText = "MENGIRIM...";
+
+        fetch(URL_SCRIPT, {
+            method: 'POST',
+            body: JSON.stringify({nama: namaUser, skor: skorFinal})
+        })
+        .then(res => res.text())
+        .then(hasil => {
+            if(hasil == "Sudah Mengerjakan") {
+                bukaModal("Kamu sudah pernah mengerjakan!", "❌");
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                playSnd('win');
+                bukaModal("Jawaban Terkirim! ✅", "🎉");
+                document.getElementById('p-quiz').classList.add('hidden');
+                document.getElementById('prog-cont').classList.add('hidden');
+                document.getElementById('finish').classList.remove('hidden');
+                document.getElementById('h-nama').innerText = "HEBAT, " + namaUser + "!";
+                document.getElementById('h-skor').innerText = skorFinal;
+            }
+        });
+    }
+</script>
+</body>
+</html>
